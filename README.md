@@ -1,62 +1,50 @@
-# Gonzalez Heating & Cooling
+# Gonzalez Heating + Cooling
 
-Modern single-page marketing site for Gonzalez Heating & Cooling, built with React, TypeScript, Vite, and Tailwind. The layout mirrors the patriotic flyer with a bold header band, curved hero divider, data-driven service accordions, and a Formspree-ready contact form.
+Single-page React 19 / TypeScript / Vite marketing site. The existing hero and rotating photographic showcase are enhanced by progressively enhanced service content and an HTML POST contact form.
 
-## Getting Started
+## Development and verification
 
-```bash
+```sh
 npm install
 npm run dev
+npm run lint
+npm run build
+node scripts/check-build.mjs
+npm run preview
 ```
 
-- `npm run dev` — start the local dev server (default http://localhost:5173).
-- `npm run build` — type-check and create a production build under `dist/`.
-- `npm run preview` — preview the production build locally.
-- `npm run lint` — run ESLint against the project.
+`npm run build` type-checks, bundles a temporary server renderer with Vite, builds the client, then inserts React-rendered HTML and JSON-LD into `dist/index.html`. The temporary renderer is removed. No server runtime, router, or new dependency is required. `src/main.tsx` hydrates built HTML and uses client rendering during development. Browser globals must stay inside effects so prerendering and hydration agree.
 
-## Environment Variables
+`check-build.mjs` verifies rendered content, one H1, service panels and their unhidden server-rendered fallback, structured data, unique IDs, local links/assets, and domain-dependent indexing files. Preview builds and configured builds were exercised; use a disposable example domain/endpoint for configuration checks, never submit test customer inquiries.
 
-Add a `.env.local` (or `.env`) file to supply optional integrations:
+## Configuration and launch
 
-```
-VITE_FORMSPREE_ID=your_form_id
-```
+Copy `.env.example` to `.env.local` or set variables in the build environment:
 
-When the Formspree ID is present the contact form POSTs to `https://formspree.io/f/<id>`. Without it, submissions are logged to the console so you can prototype safely.
+- `VITE_SITE_URL`: final public HTTPS origin, e.g. `https://your-domain.com` (no path). With this set, the build generates the canonical, absolute social URLs, an indexable robots meta tag, `robots.txt`, and a one-URL sitemap. Without it, the build is **noindex**, omits canonical/sitemap, and warns. Keep this empty for preview deployments. This is indexing control, not access control.
+- `VITE_CONTACT_FORM_ACTION`: hosted HTTPS POST endpoint, e.g. the client's Formspree endpoint. Without it, the form remains visible with a call notice and disabled submission. Configure spam protection, delivery recipients, and success/error pages at the form provider. Never put secrets in `VITE_` variables.
 
-## Design Tokens & Theming
+The earlier `VITE_FORMSPREE_ID` README instruction was stale; it is not supported by the form.
 
-- **CSS variables** live in `src/styles/theme.css`. Update the brand palette, typography, shadows, or spacing tokens in one place to restyle the entire site.
-- **Tailwind config** (`tailwind.config.ts`) mirrors the variables, exposing classes such as `bg-red`, `text-grey-600`, `font-heading`, and `shadow-subtle`.
-- Global resets, fonts (Montserrat + Inter), and motion preferences are also handled in `theme.css`.
+Before publishing:
 
-## Key Files & Structure
+1. Confirm the business facts and service scope listed in `LAUNCH.md`.
+2. Set the final domain and form endpoint; rebuild and run the checks.
+3. Host `dist/` with HTTPS. Redirect alternate hosts to the canonical origin. Serve genuine 404 responses for nonexistent paths rather than rewriting every URL to this single page.
+4. Configure compression and asset caching at the host (immutable for hashed `/assets/`; revalidate HTML). No hosting provider has been configured in this repository.
+5. Verify the deployed page, images, canonical, sitemap, robots, real mobile performance, and form delivery with client-approved test data. Check provider failure and spam handling too.
+6. Register Google Search Console/Bing Webmaster Tools, submit the sitemap, and verify the client's business listing details. Configure lead measurement and appropriate privacy disclosures once the client chooses providers and data practices.
 
-```
-src/
-  assets/                // Mascot and illustration placeholders
-  components/            // UI building blocks (Header, Hero, Services, etc.)
-  data/services.ts       // Service copy and accordion metadata
-  styles/theme.css       // CSS variables & base styles
-  App.tsx                // Page composition using the components above
-```
+## Ownership and assets
 
-The services section pulls from `src/data/services.ts`, making it easy to add or reorder offerings. Section separators and SVG dividers (`CurvedDivider`, `StripeSeparator`) are reusable between sections.
+- `src/data/business.ts`: business name, contact, location, and display hours. Build schema hours currently mirror the display schedule; update both if it changes.
+- `src/data/services.ts`: shared service descriptions, labels, scope notes, form options, and Service schema content.
+- `src/components/ServicesShowcase.tsx`: a single service content tree. The server renders all five articles visibly; React enables rotation after mounting. Stable service fragment IDs also match schema URLs.
+- `scripts/build.mjs`: build orchestration, metadata, HVACBusiness/Service JSON-LD, sitemap, robots. No fabricated address, ratings, credentials, or FAQ rich-result claims.
+- `src/styles/theme.css`: theme and focus/motion rules. Fonts load through one stylesheet link in `index.html`.
+- `public/images/`: responsive 640/1320px WebP versions of the existing photographs. Original photographs are retained. The hero stays uncropped; showcase images remain decorative.
+- `src/assets/logo.webp` and `public/favicon-48.png`: smaller derivatives of the supplied logo. The existing `public/og-image.png` is retained.
 
-## Customising Visuals
+The showcase pauses on text hover, keyboard focus, page/section invisibility, reduced motion, or its persistent Pause control. Left/Right/Home/End keys select services. Its initial state is deterministic for hydration. All service articles and contact links remain available without JavaScript. No duplicate service section is rendered.
 
-- Swap in your production logo at `src/assets/logo.png` to update the header badge. Aim for a square image around 160×160px for best results.
-- Replace `src/assets/heroImage.jpg` with your preferred hero photography to refresh the hero panel.
-- Update `public/og-image.png` if you want bespoke social sharing imagery.
-
-## Accessibility & UX
-
-- Semantic landmarks (`<header>`, `<main>`, `<footer>`) and a skip link support keyboard navigation.
-- Service accordions include `aria-expanded`, `aria-controls`, and keyboard toggling.
-- Reduced-motion users receive simplified transitions via the global media query in `theme.css`.
-
-## Deployment Notes
-
-1. Run `npm run build` and host the `dist/` output on any static hosting provider.
-2. Ensure `VITE_FORMSPREE_ID` is set in the production environment if you plan to receive form submissions.
-3. Update DNS, analytics, or additional meta tags as needed in `index.html`.
+`AGENTS.md` is intentionally gitignored local engineering memory.

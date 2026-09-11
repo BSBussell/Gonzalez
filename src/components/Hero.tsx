@@ -1,8 +1,6 @@
-import heroImage from '../assets/heroImage.jpg'
 import { Badge } from './Badge'
 import { Button } from './Button'
-import { CurvedDivider } from './CurvedDivider'
-import { cn } from '../lib/cn'
+import { BUSINESS } from '../data/business'
 import { StarburstIcon } from './icons/StarburstIcon'
 
 export function Hero() {
@@ -12,54 +10,56 @@ export function Hero() {
       aria-labelledby="hero-heading"
       className="relative bg-surface"
     >
-      <CurvedDivider className="-mt-14 text-surface" />
-      <div className="relative mx-auto flex max-w-content flex-col gap-10 px-4 pb-20 pt-10 sm:px-6 lg:flex-row lg:items-center lg:gap-16 lg:pb-24 lg:pt-12">
-        <div className="relative flex flex-1 flex-col gap-6">
+      <div className="relative mx-auto flex max-w-content flex-col gap-10 px-4 pb-16 pt-12 sm:px-6 lg:flex-row lg:items-center lg:gap-16 lg:py-20">
+        <div data-enter className="relative flex flex-1 flex-col gap-6">
           <Badge
-            icon={<StarburstIcon className="h-4 w-4 text-blue" accentColor="var(--color-red)" />}
+            icon={<StarburstIcon className="h-4 w-4 text-blue" />}
           >
-            Family Owned
+            Family owned · Knoxville, TN
           </Badge>
           <h1
             id="hero-heading"
-            className="text-3xl font-extrabold uppercase tracking-wide text-navy sm:text-4xl lg:text-5xl"
+            className="max-w-xl text-4xl font-extrabold leading-[1.1] tracking-tight text-navy sm:text-5xl lg:text-[3.25rem]"
           >
-            Commercial & Residential HVAC, Done Right.
+            Comfort for your home. Care for your business.
           </h1>
           <p className="max-w-xl text-base leading-relaxed text-grey-800 sm:text-lg">
-            From fast repairs to dependable gas line work, Gonzalez keeps your
-            home or business comfortable and safe.
+            Gonzalez Heating + Cooling LLC provides heating, cooling, and gas line services in Knoxville, Tennessee. Get practical
+            answers and dependable care from the family-owned Gonzalez team.
           </p>
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
             <Button as="a" href="#contact">
               Request Service
             </Button>
-            <Button as="a" href="#services" variant="secondary">
-              View Services
+            <Button as="a" href={BUSINESS.phoneHref} variant="secondary">
+              Call {BUSINESS.phoneDisplay}
             </Button>
           </div>
+          <p className="text-sm text-grey-600">Residential &amp; commercial · Repairs, maintenance &amp; gas lines</p>
         </div>
-        <div className="relative flex flex-1 justify-center lg:justify-end">
-          <div
-            className={cn(
-              'relative rounded-[28px] border border-white border-opacity-40 bg-gradient-to-br from-blue via-navy to-navy p-4 shadow-subtle',
-              'max-w-md',
-            )}
-          >
-            <img
-              src={heroImage}
-              alt="Technician servicing an HVAC rooftop unit"
-              className="h-full w-full rounded-[22px] object-cover"
-            />
-            <StarburstIcon
-              className="absolute -top-4 -left-4 h-9 w-9 text-white text-opacity-80"
-              accentColor="var(--color-blue)"
-            />
-            <StarburstIcon
-              className="absolute -bottom-6 right-6 h-11 w-11 text-white text-opacity-60"
-              accentColor="var(--color-red)"
-            />
-          </div>
+        <div data-enter className="relative flex flex-1 justify-center lg:justify-end">
+          <figure className="w-full max-w-xl overflow-hidden rounded-2xl border border-grey-150 bg-surface shadow-subtle">
+            <div className="relative overflow-hidden rounded-none">
+              <img
+                src="/images/GonzalezPicture-1320.webp"
+                srcSet="/images/GonzalezPicture-640.webp 640w, /images/GonzalezPicture-1320.webp 1320w"
+                sizes="(min-width: 1024px) 520px, (min-width: 640px) 576px, calc(100vw - 32px)"
+                alt="The Gonzalez team beside a rooftop HVAC unit"
+                width={1320}
+                height={971}
+                fetchPriority="high"
+                className="h-auto w-full rounded-none"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.22),inset_0_-36px_56px_rgba(0,24,58,0.36)]"
+              />
+            </div>
+            <figcaption className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-4 text-sm">
+              <span className="font-semibold text-navy">The people behind your comfort.</span>
+              <span className="text-grey-600">Gonzalez HVAC</span>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>

@@ -28,7 +28,7 @@ const styles: Record<Variant, string> = {
 }
 
 const sharedStyles =
-  'inline-flex items-center justify-center gap-2 rounded-subtle px-6 py-3 font-semibold tracking-wide uppercase transition-colors duration-200 ease-in-out-standard focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-60'
+  'inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-colors duration-200 ease-in-out-standard focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none disabled:pointer-events-none disabled:bg-grey-150 disabled:text-grey-600 disabled:shadow-none'
 
 function renderButton(
   props: ButtonProps,

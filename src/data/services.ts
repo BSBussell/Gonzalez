@@ -1,6 +1,9 @@
 export type Service = {
   id: string
   title: string
+  navigationLabel: string
+  shortLabel: string
+  requestLabel: string
   summary: string
   details: string[]
   disclaimer?: string
@@ -10,6 +13,9 @@ export const SERVICES: Service[] = [
   {
     id: 'commercial',
     title: 'Commercial HVAC',
+    navigationLabel: 'Commercial HVAC',
+    shortLabel: 'Commercial',
+    requestLabel: 'Commercial HVAC',
     summary: 'Installations, maintenance, and diagnostics for offices and storefronts.',
     details: [
       'Rooftop units, split systems, and ventilation checks',
@@ -20,6 +26,9 @@ export const SERVICES: Service[] = [
   {
     id: 'residential',
     title: 'Residential HVAC',
+    navigationLabel: 'Residential HVAC',
+    shortLabel: 'Residential',
+    requestLabel: 'Residential HVAC',
     summary: 'Tune-ups, replacements, and comfort upgrades for your home.',
     details: [
       'Furnace & heat pump diagnostics',
@@ -30,7 +39,10 @@ export const SERVICES: Service[] = [
   {
     id: 'repairs',
     title: 'Service & Repairs',
-    summary: 'Rapid troubleshooting to get you back online.',
+    navigationLabel: 'Service & Repair',
+    shortLabel: 'Service & Repair',
+    requestLabel: 'Service & Repair',
+    summary: 'Heating and cooling troubleshooting for no-heat, no-cool, and airflow problems.',
     details: [
       'No-cool/no-heat calls',
       'Electrical & airflow issues',
@@ -40,7 +52,10 @@ export const SERVICES: Service[] = [
   {
     id: 'gas-lines',
     title: 'Gas Lines',
-    summary: 'Licensed gas line service and safety checks.',
+    navigationLabel: 'Gas Lines',
+    shortLabel: 'Gas Lines',
+    requestLabel: 'Gas Lines',
+    summary: 'Gas line routing, testing, and safety checks.',
     details: [
       'Leak detection and pressure tests',
       'New line runs to appliances or units',
@@ -50,12 +65,15 @@ export const SERVICES: Service[] = [
   {
     id: 'line-runs',
     title: 'Line Runs (No Install)',
+    navigationLabel: 'Line Runs',
+    shortLabel: 'Line Runs',
+    requestLabel: 'Line Runs',
     summary: 'We run lines; we do not install appliances/units.',
     details: [
       'Refrigerant and gas line routing',
       'Proper supports, insulation, and sealing',
       'Handover ready for third-party installation',
     ],
-    disclaimer: 'Gonzalez runs lines but does not perform appliance/unit installs.',
+    disclaimer: 'This line-running service does not include appliance or unit installation.',
   },
 ]

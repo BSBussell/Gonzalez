@@ -1,345 +1,83 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-  type ReactNode,
-} from 'react'
+import type { ReactNode } from 'react'
 import { SERVICES } from '../data/services'
-import { cn } from '../lib/cn'
+import { BUSINESS } from '../data/business'
 import { Badge } from './Badge'
 import { Button } from './Button'
 import { StarburstIcon } from './icons/StarburstIcon'
 
-type FormState = {
-  name: string
-  email: string
-  phone: string
-  service: string
-  message: string
-  consent: boolean
-}
-
-type Toast = {
-  message: string
-  tone: 'success' | 'error'
-}
-
-const INITIAL_STATE: FormState = {
-  name: '',
-  email: '',
-  phone: '',
-  service: '',
-  message: '',
-  consent: false,
-}
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const SERVICE_TYPES = [...SERVICES.map((service) => service.requestLabel), 'Not Sure']
 
 export function ContactForm() {
-  const [formState, setFormState] = useState<FormState>(INITIAL_STATE)
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>(
-    {},
-  )
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>(
-    'idle',
-  )
-  const [toast, setToast] = useState<Toast | null>(null)
-
-  const formspreeId = useMemo(
-    () =>
-      import.meta.env.VITE_FORMSPREE_ID ||
-      import.meta.env.NEXT_PUBLIC_FORMSPREE_ID ||
-      '',
-    [],
-  )
-
-  useEffect(() => {
-    if (!toast) return
-    const timer = window.setTimeout(() => setToast(null), 4000)
-    return () => window.clearTimeout(timer)
-  }, [toast])
-
-  const handleChange = (
-    event:
-      | ChangeEvent<HTMLInputElement>
-      | ChangeEvent<HTMLTextAreaElement>
-      | ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const target = event.target as
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | HTMLSelectElement
-    const { name, value, type } = target
-    const nextValue =
-      type === 'checkbox' && 'checked' in target ? target.checked : value
-    setFormState((prev) => ({
-      ...prev,
-      [name]: nextValue,
-    }))
-    if (errors[name as keyof FormState]) {
-      setErrors((prev) => {
-        const next = { ...prev }
-        delete next[name as keyof FormState]
-        return next
-      })
-    }
-  }
-
-  const validate = () => {
-    const nextErrors: Partial<Record<keyof FormState, string>> = {}
-
-    if (!formState.name.trim()) {
-      nextErrors.name = 'Please enter your name.'
-    }
-    if (!EMAIL_REGEX.test(formState.email)) {
-      nextErrors.email = 'Enter a valid email address.'
-    }
-    if (!formState.phone.trim()) {
-      nextErrors.phone = 'Phone number is required.'
-    }
-    if (!formState.service) {
-      nextErrors.service = 'Select a service.'
-    }
-    if (!formState.message.trim()) {
-      nextErrors.message = 'Tell us more about the request.'
-    }
-    if (!formState.consent) {
-      nextErrors.consent = 'Consent is required to submit.'
-    }
-
-    return nextErrors
-  }
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setStatus('submitting')
-    const nextErrors = validate()
-
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors)
-      setStatus('error')
-      setToast({ message: 'Please fix the highlighted fields.', tone: 'error' })
-      return
-    }
-
-    const payload = {
-      ...formState,
-      submittedAt: new Date().toISOString(),
-    }
-
-    try {
-      if (formspreeId) {
-        const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-      } else {
-        console.log('Contact form submission (mock)', payload)
-      }
-
-      setStatus('success')
-      setToast({
-        message: "Thanks! We'll reach out shortly to schedule service.",
-        tone: 'success',
-      })
-      setFormState(INITIAL_STATE)
-      setErrors({})
-    } catch (error) {
-      console.error('Contact form submission failed', error)
-      setStatus('error')
-      setToast({
-        message:
-          'Something went wrong while sending your request. Please try again.',
-        tone: 'error',
-      })
-    }
-  }
+  const formAction = import.meta.env.VITE_CONTACT_FORM_ACTION || undefined
 
   return (
-    <section
-      id="contact"
-      aria-labelledby="contact-heading"
-      className="bg-surface py-16 sm:py-20"
-    >
+    <section id="contact" aria-labelledby="contact-heading" className="bg-surface py-16 sm:py-20">
       <div className="mx-auto max-w-content px-4 sm:px-6">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Badge
-              icon={<StarburstIcon className="h-4 w-4 text-blue" accentColor="var(--color-red)" />}
-            >
-              Request Service
-            </Badge>
-            <h2
-              id="contact-heading"
-              className="mt-4 text-3xl font-extrabold uppercase tracking-wide text-navy sm:text-4xl"
-            >
-              Let&apos;s book your appointment
-            </h2>
-            <p className="mt-3 max-w-2xl text-base text-grey-800 sm:text-lg">
-              Send the details and our dispatch team will confirm your visit, go
-              over equipment needs, and lock in the best time for your schedule.
-            </p>
-          </div>
-          <div className="hidden rounded-subtle border border-blue border-opacity-40 bg-blue bg-opacity-10 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-blue sm:block">
-            <p>Weekday response within 1 hour</p>
-            <p>Emergency calls available</p>
-          </div>
+        <div data-enter className="max-w-2xl">
+          <Badge icon={<StarburstIcon className="h-4 w-4 text-blue" />}>Request Service</Badge>
+          <h2 id="contact-heading" className="mt-4 text-3xl font-bold leading-tight tracking-tight text-navy sm:text-4xl">Request Service</h2>
+          <p className="mt-4 text-base leading-7 text-grey-600 sm:text-lg">Call Gonzalez Heating + Cooling LLC to discuss your request. {formAction ? 'You can also send the details below for follow-up.' : 'You can also reach us by email.'}</p>
         </div>
 
-        <div className="relative rounded-[28px] border border-grey-150 bg-white p-6 shadow-subtle sm:p-8">
-          {toast && (
-            <div
-              role="status"
-              aria-live="polite"
-              className={cn(
-                'pointer-events-none absolute right-6 top-6 flex max-w-xs items-center gap-3 rounded-subtle px-4 py-3 text-sm font-semibold uppercase tracking-wide shadow-subtle',
-                toast.tone === 'success'
-                  ? 'bg-blue text-white'
-                  : 'bg-red text-white',
-              )}
-            >
-              {toast.message}
-            </div>
-          )}
+        <div className="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
+          <aside data-enter className="order-2 border-t border-grey-150 pt-8 lg:border-l lg:border-t-0 lg:pl-16 lg:pt-2">
+            <h3 className="text-2xl font-bold tracking-tight text-navy">Prefer to talk?</h3>
+            <p className="mt-3 max-w-sm text-base leading-7 text-grey-600">A quick call is often the fastest way to get started. We’ll listen, answer questions, and help you decide what comes next.</p>
+            <Button as="a" href={BUSINESS.phoneHref} className="mt-7 min-h-12 w-full sm:w-auto">Call {BUSINESS.phoneDisplay}</Button>
 
-          <form
-            onSubmit={handleSubmit}
-            noValidate
-            className="grid gap-6 md:grid-cols-2"
-          >
-            <Field
-              label="Full Name"
-              name="name"
-              required
-              error={errors.name}
-            >
-              <input
-                id="contact-name"
-                name="name"
-                type="text"
-                value={formState.name}
-                onChange={handleChange}
-                autoComplete="name"
-                required
-                className={inputClass(errors.name)}
-              />
-            </Field>
-            <Field
-              label="Email"
-              name="email"
-              required
-              error={errors.email}
-            >
-              <input
-                id="contact-email"
-                name="email"
-                type="email"
-                value={formState.email}
-                onChange={handleChange}
-                autoComplete="email"
-                required
-                className={inputClass(errors.email)}
-              />
-            </Field>
-            <Field
-              label="Phone"
-              name="phone"
-              required
-              error={errors.phone}
-            >
-              <input
-                id="contact-phone"
-                name="phone"
-                type="tel"
-                value={formState.phone}
-                onChange={handleChange}
-                autoComplete="tel"
-                required
-                className={inputClass(errors.phone)}
-                placeholder="e.g. 480-555-0123"
-              />
-            </Field>
-            <Field
-              label="Requested Service"
-              name="service"
-              required
-              error={errors.service}
-            >
-              <select
-                id="contact-service"
-                name="service"
-                value={formState.service}
-                onChange={handleChange}
-                required
-                className={cn(inputClass(errors.service), 'appearance-none')}
-              >
-                <option value="">Select a service</option>
-                {SERVICES.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.title}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field
-              className="md:col-span-2"
-              label="Message"
-              name="message"
-              required
-              error={errors.message}
-            >
-              <textarea
-                id="contact-message"
-                name="message"
-                rows={5}
-                value={formState.message}
-                onChange={handleChange}
-                required
-                className={cn(inputClass(errors.message), 'resize-vertical')}
-              />
-            </Field>
-            <div className="md:col-span-2">
-              <label className="flex items-start gap-3 text-sm text-grey-800">
-                <input
-                  type="checkbox"
-                  name="consent"
-                  checked={formState.consent}
-                  onChange={handleChange}
-                  className="mt-1 h-4 w-4 accent-blue"
-                  required
-                />
-                <span>
-                  I agree to receive scheduling updates from Gonzalez Heating &
-                  Cooling LLC. Your info stays private with our team.
-                </span>
-              </label>
-              {errors.consent && (
-                <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-red">
-                  {errors.consent}
-                </p>
-              )}
+            <div className="mt-8 space-y-4 border-t border-grey-150 pt-6 text-sm">
+              <div>
+                <p className="font-semibold text-navy">Hours</p>
+                <p className="mt-1 text-grey-600">{BUSINESS.hours}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-navy">Email</p>
+                <a href={`mailto:${BUSINESS.email}`} className="mt-1 inline-block font-medium text-blue hover:text-navy">{BUSINESS.email}</a>
+              </div>
+              <div>
+                <p className="font-semibold text-navy">Service area</p>
+                <p className="mt-1 text-grey-600">{BUSINESS.location}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-4 md:col-span-2">
-              <Button type="submit" disabled={status === 'submitting'}>
-                {status === 'submitting' ? 'Sending...' : 'Submit Request'}
-              </Button>
-              {!formspreeId && (
-                <p className="text-xs uppercase tracking-widest text-grey-600">
-                  Form posts to console in this environment.
-                </p>
-              )}
-            </div>
-          </form>
+          </aside>
+
+          <div data-enter className="order-1">
+            <h3 className="text-2xl font-bold tracking-tight text-navy">Send us the details</h3>
+            <p className="mt-3 text-sm leading-6 text-grey-600">Include your city or ZIP code, the type of system, and what you’re noticing. Required fields are marked *.</p>
+
+            {!formAction && <p id="contact-availability" className="mt-4 text-sm leading-6 text-grey-600">Online requests are not available yet. Please <a href={BUSINESS.phoneHref} className="font-semibold text-blue underline underline-offset-4">call {BUSINESS.phoneDisplay}</a> to request service.</p>}
+
+            <form action={formAction} method="post" onSubmit={(event) => { if (!formAction) event.preventDefault() }} className="mt-7 grid gap-x-5 gap-y-5 sm:grid-cols-2">
+              <Field label="Name" name="name">
+                <input id="contact-name" name="name" type="text" autoComplete="name" required className={inputClass} />
+              </Field>
+              <Field label="Phone" name="phone">
+                <input id="contact-phone" name="phone" type="tel" autoComplete="tel" required className={inputClass} />
+              </Field>
+              <Field label="Email" name="email">
+                <input id="contact-email" name="email" type="email" autoComplete="email" required className={inputClass} />
+              </Field>
+              <Field label="Service Type" name="serviceType">
+                <select id="contact-serviceType" name="serviceType" defaultValue="" required className={inputClass}>
+                  <option value="" disabled>Select a service</option>
+                  {SERVICE_TYPES.map((service) => <option key={service} value={service}>{service}</option>)}
+                </select>
+              </Field>
+              <Field label="What can we help with?" name="message" className="sm:col-span-2">
+                <textarea id="contact-message" name="message" rows={4} required className={inputClass} placeholder="Tell us a little about the issue or project." />
+              </Field>
+              <fieldset className="sm:col-span-2">
+                <legend className="text-sm font-semibold text-navy">Preferred Contact Method</legend>
+                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-3 text-sm text-grey-800">
+                  <label className="flex min-h-11 items-center gap-2"><input type="radio" name="preferredContact" value="Phone" defaultChecked className="h-4 w-4 accent-blue" />Phone</label>
+                  <label className="flex min-h-11 items-center gap-2"><input type="radio" name="preferredContact" value="Email" className="h-4 w-4 accent-blue" />Email</label>
+                </div>
+              </fieldset>
+              <div className="pt-2 sm:col-span-2">
+                <Button type="submit" disabled={!formAction} aria-describedby={!formAction ? 'contact-availability' : undefined} className="min-h-12 w-full sm:w-auto">Send Service Request</Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </section>
@@ -349,48 +87,17 @@ export function ContactForm() {
 type FieldProps = {
   label: string
   name: string
-  required?: boolean
-  error?: string
   children: ReactNode
   className?: string
 }
 
-function Field({
-  label,
-  name,
-  required,
-  error,
-  children,
-  className,
-}: FieldProps) {
+function Field({ label, name, children, className }: FieldProps) {
   return (
     <div className={className}>
-      <label
-        htmlFor={`contact-${name}`}
-        className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"
-      >
-        {label}
-        {required && <span className="text-red">*</span>}
-      </label>
+      <label htmlFor={`contact-${name}`} className="text-sm font-semibold text-navy">{label} *</label>
       <div className="mt-2">{children}</div>
-      {error && (
-        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-red">
-          {error}
-        </p>
-      )}
     </div>
   )
 }
 
-const inputBase =
-  'w-full rounded-subtle border border-grey-150 bg-white px-3 py-3 text-sm text-grey-800 shadow-sm transition-colors duration-200 ease-in-out-standard focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue focus:ring-opacity-40 motion-reduce:transition-none'
-
-function inputClass(hasError?: string) {
-  if (hasError) {
-    return cn(
-      inputBase,
-      'border-red focus:border-red focus:ring-red focus:ring-opacity-40',
-    )
-  }
-  return inputBase
-}
+const inputClass = 'w-full rounded-lg border border-grey-150 bg-surface px-3 py-3 text-base text-grey-800 sm:text-sm transition-colors duration-200 ease-in-out-standard focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue/30 motion-reduce:transition-none'
