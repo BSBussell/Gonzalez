@@ -17,6 +17,24 @@ npm run preview
 
 `check-build.mjs` verifies rendered content, one H1, service panels and their unhidden server-rendered fallback, structured data, unique IDs, local links/assets, and domain-dependent indexing files. Preview builds and configured builds were exercised; use a disposable example domain/endpoint for configuration checks, never submit test customer inquiries.
 
+## GitHub Pages production branch
+
+Keep development on `main`. `prod` contains only the generated site, with `index.html`, assets, and `.nojekyll` at its root. In GitHub Settings → Pages, select **Deploy from a branch → prod → / (root)**.
+
+From a clean, committed source checkout:
+
+```sh
+git switch main
+npm run deploy:prod          # build, validate, and update local prod
+npm run deploy:prod -- --push # also push prod to origin
+```
+
+The command leaves your source checkout in place. It creates a normal commit on `prod` using an isolated Git index; old output disappears from the new tree without deleting source files. It refuses dirty source checkouts and any checked-out `prod` branch. It does not force-push. If a push is rejected because another checkout deployed, fetch and reconcile `prod` before retrying. Push source commits on `main` separately to retain the publishing command on GitHub.
+
+The default deployment base comes from the GitHub remote (`/Gonzalez/` for this repository). `VITE_BASE_PATH=/` supports a domain-root deployment; an existing production `CNAME` is preserved, and `public/CNAME` can set or replace it. A configured `VITE_SITE_URL` or CNAME defaults the deployment base to `/`. To remove a custom domain, remove its CNAME from `prod` and update GitHub Pages settings. Ordinary `npm run build` still defaults to `/`; use `VITE_BASE_PATH=/Gonzalez/` for a manual project-path build and pass the same variable to `check-build.mjs`.
+
+The default GitHub project URL remains **noindex** until a final custom-domain origin is configured through `VITE_SITE_URL`. The existing contact fallback stays disabled until an endpoint is configured. This command does not change Pages settings or configure a domain/form provider.
+
 ## Configuration and launch
 
 Copy `.env.example` to `.env.local` or set variables in the build environment:
@@ -31,7 +49,7 @@ Before publishing:
 1. Confirm the business facts and service scope listed in `LAUNCH.md`.
 2. Set the final domain and form endpoint; rebuild and run the checks.
 3. Host `dist/` with HTTPS. Redirect alternate hosts to the canonical origin. Serve genuine 404 responses for nonexistent paths rather than rewriting every URL to this single page.
-4. Configure compression and asset caching at the host (immutable for hashed `/assets/`; revalidate HTML). No hosting provider has been configured in this repository.
+4. Configure compression and asset caching at the host (immutable for hashed `/assets/`; revalidate HTML). The production-branch command supports GitHub Pages; configure its publishing source as described above.
 5. Verify the deployed page, images, canonical, sitemap, robots, real mobile performance, and form delivery with client-approved test data. Check provider failure and spam handling too.
 6. Register Google Search Console/Bing Webmaster Tools, submit the sitemap, and verify the client's business listing details. Configure lead measurement and appropriate privacy disclosures once the client chooses providers and data practices.
 

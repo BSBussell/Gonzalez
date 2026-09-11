@@ -41,8 +41,8 @@ export function Hero() {
           <figure className="w-full max-w-xl overflow-hidden rounded-2xl border border-grey-150 bg-surface shadow-subtle">
             <div className="relative overflow-hidden rounded-none">
               <img
-                src="/images/GonzalezPicture-1320.webp"
-                srcSet="/images/GonzalezPicture-640.webp 640w, /images/GonzalezPicture-1320.webp 1320w"
+                src={`${import.meta.env.BASE_URL}images/GonzalezPicture-1320.webp`}
+                srcSet={`${import.meta.env.BASE_URL}images/GonzalezPicture-640.webp 640w, ${import.meta.env.BASE_URL}images/GonzalezPicture-1320.webp 1320w`}
                 sizes="(min-width: 1024px) 520px, (min-width: 640px) 576px, calc(100vw - 32px)"
                 alt="The Gonzalez team beside a rooftop HVAC unit"
                 width={1320}

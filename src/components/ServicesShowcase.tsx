@@ -141,8 +141,8 @@ export function ServicesShowcase() {
             {SERVICE_PHOTOS.map((photo, index) => (
               <img
                 key={photo.src}
-                src={`/images/${photo.src.split('/').pop()!.split('.')[0]}-1320.webp`}
-                srcSet={`/images/${photo.src.split('/').pop()!.split('.')[0]}-640.webp 640w, /images/${photo.src.split('/').pop()!.split('.')[0]}-1320.webp 1320w`}
+                src={`${import.meta.env.BASE_URL}images/${photo.src.split('/').pop()!.split('.')[0]}-1320.webp`}
+                srcSet={`${import.meta.env.BASE_URL}images/${photo.src.split('/').pop()!.split('.')[0]}-640.webp 640w, ${import.meta.env.BASE_URL}images/${photo.src.split('/').pop()!.split('.')[0]}-1320.webp 1320w`}
                 sizes="(min-width: 1024px) 66vw, 100vw"
                 alt=""
                 aria-hidden="true"

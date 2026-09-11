@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFile, access } from 'node:fs/promises'
+const base = process.env.VITE_BASE_PATH || '/'
 const html = await readFile('dist/index.html', 'utf8')
 assert.equal((html.match(/<h1\b/g) || []).length, 1)
 assert.ok(html.includes('Gonzalez Heating + Cooling LLC provides'))
@@ -19,7 +20,14 @@ assert.equal(schema['@graph'].filter(item => item['@type'] === 'Service').length
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1])
 assert.equal(new Set(ids).size, ids.length, 'Duplicate element IDs')
 for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(id), `Missing anchor ${id}`)
-for (const [, path] of html.matchAll(/(?:src|href)="(\/[^"#]+)"/g)) await access(`dist${path}`)
+const assetPaths = [...html.matchAll(/(?:src|href)="(\/[^"#]+)"/g)].map(match => match[1])
+for (const [, srcset] of html.matchAll(/(?:srcSet|imagesrcset)="([^"]+)"/gi)) {
+  assetPaths.push(...srcset.split(',').map(candidate => candidate.trim().split(/\s+/)[0]))
+}
+for (const path of assetPaths) {
+  assert.ok(path.startsWith(base), `Asset outside base ${base}: ${path}`)
+  await access(`dist/${path.slice(base.length)}`)
+}
 const canonical = html.match(/rel="canonical" href="([^"]+)"/)
 if (canonical) {
   assert.ok(html.includes('content="index, follow, max-image-preview:large"'))
