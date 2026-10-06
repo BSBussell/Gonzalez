@@ -17,7 +17,7 @@ This pass preserves the visual system and adds build-time rendering, a progressi
 
 ## Launch configuration
 
-Set `VITE_SITE_URL` and `VITE_CONTACT_FORM_ACTION`, rebuild, and verify host configuration as described in README. An unset domain deliberately generates a noindex preview. No domain, account, hosting, form delivery, or analytics integration was configured or published in this pass.
+Production domain configuration now lives in `.env.production` (`https://gonzalezhvacknox.com`) and `public/CNAME`. Builds use root asset paths and indexable metadata. Configure `VITE_CONTACT_FORM_ACTION` and verify host configuration as described in README. An explicitly empty site URL generates a noindex preview. DNS, live Pages custom-domain/HTTPS settings, form delivery, and analytics remain unverified; repository configuration alone does not establish a live deployment.
 
 No postal street address was supplied; schema does not invent one. HVACBusiness markup describes the business but does not establish eligibility for Google's local-business rich results. Verify live markup with search-engine tools after facts and domain are finalized.
 

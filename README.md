@@ -33,11 +33,11 @@ The command leaves your source checkout in place. It creates a normal commit on 
 
 The default deployment base comes from the GitHub remote (`/Gonzalez/` for this repository). `VITE_BASE_PATH=/` supports a domain-root deployment; an existing production `CNAME` is preserved, and `public/CNAME` can set or replace it. A configured `VITE_SITE_URL` or CNAME defaults the deployment base to `/`. To remove a custom domain, remove its CNAME from `prod` and update GitHub Pages settings. Ordinary `npm run build` still defaults to `/`; use `VITE_BASE_PATH=/Gonzalez/` for a manual project-path build and pass the same variable to `check-build.mjs`.
 
-The default GitHub project URL remains **noindex** until a final custom-domain origin is configured through `VITE_SITE_URL`. The existing contact fallback stays disabled until an endpoint is configured. This command does not change Pages settings or configure a domain/form provider.
+Production builds use `https://gonzalezhvacknox.com/`, configured in tracked `.env.production`, with root-relative assets and an indexable canonical/sitemap. `public/CNAME` declares the same domain for GitHub Pages. DNS and Pages domain/HTTPS settings must still be configured at their providers. For a noindex preview, explicitly override `VITE_SITE_URL` with an empty environment value; use `VITE_BASE_PATH` to match the preview host path. The existing contact fallback stays disabled until an endpoint is configured. This command does not change Pages settings or configure a domain/form provider.
 
 ## Configuration and launch
 
-Copy `.env.example` to `.env.local` or set variables in the build environment:
+Production defaults live in `.env.production`. Set overrides in `.env.production.local` (gitignored) or the build environment. For development, use `.env.local`; avoid an empty site URL there if you want to retain the production default:
 
 - `VITE_SITE_URL`: final public HTTPS origin, e.g. `https://your-domain.com` (no path). With this set, the build generates the canonical, absolute social URLs, an indexable robots meta tag, `robots.txt`, and a one-URL sitemap. Without it, the build is **noindex**, omits canonical/sitemap, and warns. Keep this empty for preview deployments. This is indexing control, not access control.
 - `VITE_CONTACT_FORM_ACTION`: hosted HTTPS POST endpoint, e.g. the client's Formspree endpoint. Without it, the form remains visible with a call notice and disabled submission. Configure spam protection, delivery recipients, and success/error pages at the form provider. Never put secrets in `VITE_` variables.
