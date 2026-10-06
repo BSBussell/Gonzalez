@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type FormEvent } from 'react'
+import { useForm, ValidationError } from '@formspree/react'
 import { SERVICES } from '../data/services'
 import { BUSINESS } from '../data/business'
 import { Badge } from './Badge'
@@ -9,6 +10,34 @@ const SERVICE_TYPES = [...SERVICES.map((service) => service.requestLabel), 'Not 
 
 export function ContactForm() {
   const formAction = import.meta.env.VITE_CONTACT_FORM_ACTION || undefined
+  const formId = formAction?.split('/').filter(Boolean).pop() || 'unconfigured'
+  const [state, submit, reset] = useForm(formId)
+  const submittingRef = useRef(false)
+  const errorRef = useRef<HTMLDivElement>(null)
+  const [unexpectedError, setUnexpectedError] = useState(false)
+
+  useEffect(() => {
+    if (state.succeeded) window.location.assign(`${import.meta.env.BASE_URL}thank-you/`)
+  }, [state.succeeded])
+
+  useEffect(() => {
+    if (state.errors || unexpectedError) errorRef.current?.focus()
+  }, [state.errors, unexpectedError])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!formAction || submittingRef.current || state.succeeded) return
+    submittingRef.current = true
+    setUnexpectedError(false)
+    try {
+      await submit(event)
+    } catch {
+      reset()
+      setUnexpectedError(true)
+    } finally {
+      submittingRef.current = false
+    }
+  }
 
   return (
     <section id="contact" aria-labelledby="contact-heading" className="bg-surface py-16 sm:py-20">
@@ -47,24 +76,29 @@ export function ContactForm() {
 
             {!formAction && <p id="contact-availability" className="mt-4 text-sm leading-6 text-grey-600">Online requests are not available yet. Please <a href={BUSINESS.phoneHref} className="font-semibold text-blue underline underline-offset-4">call {BUSINESS.phoneDisplay}</a> to request service.</p>}
 
-            <form action={formAction} method="post" onSubmit={(event) => { if (!formAction) event.preventDefault() }} className="mt-7 grid gap-x-5 gap-y-5 sm:grid-cols-2">
+            <form action={formAction} method="post" onSubmit={handleSubmit} aria-busy={state.submitting} className="mt-7 grid gap-x-5 gap-y-5 sm:grid-cols-2">
               <Field label="Name" name="name">
-                <input id="contact-name" name="name" type="text" autoComplete="name" required className={inputClass} />
+                <input id="contact-name" name="name" aria-invalid={!!state.errors?.getFieldErrors('name').length} aria-describedby="contact-name-error" type="text" autoComplete="name" required className={inputClass} />
+                <ValidationError id="contact-name-error" field="name" errors={state.errors} className="mt-2 text-sm text-red" />
               </Field>
               <Field label="Phone" name="phone">
-                <input id="contact-phone" name="phone" type="tel" autoComplete="tel" required className={inputClass} />
+                <input id="contact-phone" name="phone" aria-invalid={!!state.errors?.getFieldErrors('phone').length} aria-describedby="contact-phone-error" type="tel" autoComplete="tel" required className={inputClass} />
+                <ValidationError id="contact-phone-error" field="phone" errors={state.errors} className="mt-2 text-sm text-red" />
               </Field>
               <Field label="Email" name="email">
-                <input id="contact-email" name="email" type="email" autoComplete="email" required className={inputClass} />
+                <input id="contact-email" name="email" aria-invalid={!!state.errors?.getFieldErrors('email').length} aria-describedby="contact-email-error" type="email" autoComplete="email" required className={inputClass} />
+                <ValidationError id="contact-email-error" field="email" errors={state.errors} className="mt-2 text-sm text-red" />
               </Field>
               <Field label="Service Type" name="serviceType">
-                <select id="contact-serviceType" name="serviceType" defaultValue="" required className={inputClass}>
+                <select id="contact-serviceType" name="serviceType" aria-invalid={!!state.errors?.getFieldErrors('serviceType').length} aria-describedby="contact-serviceType-error" defaultValue="" required className={inputClass}>
                   <option value="" disabled>Select a service</option>
                   {SERVICE_TYPES.map((service) => <option key={service} value={service}>{service}</option>)}
                 </select>
+                <ValidationError id="contact-serviceType-error" field="serviceType" errors={state.errors} className="mt-2 text-sm text-red" />
               </Field>
               <Field label="What can we help with?" name="message" className="sm:col-span-2">
-                <textarea id="contact-message" name="message" rows={4} required className={inputClass} placeholder="Tell us a little about the issue or project." />
+                <textarea id="contact-message" name="message" aria-invalid={!!state.errors?.getFieldErrors('message').length} aria-describedby="contact-message-error" rows={4} required className={inputClass} placeholder="Tell us a little about the issue or project." />
+                <ValidationError id="contact-message-error" field="message" errors={state.errors} className="mt-2 text-sm text-red" />
               </Field>
               <fieldset className="sm:col-span-2">
                 <legend className="text-sm font-semibold text-navy">Preferred Contact Method</legend>
@@ -74,7 +108,11 @@ export function ContactForm() {
                 </div>
               </fieldset>
               <div className="pt-2 sm:col-span-2">
-                <Button type="submit" disabled={!formAction} aria-describedby={!formAction ? 'contact-availability' : undefined} className="min-h-12 w-full sm:w-auto">Send Service Request</Button>
+                <div ref={errorRef} role="alert" tabIndex={-1} className="mb-3 text-sm text-red">
+                  <ValidationError errors={state.errors} />
+                  {(state.errors || unexpectedError) && <p className="mt-2">Your request couldn’t be sent. Check the fields above and try again, or <a href={BUSINESS.phoneHref} className="font-semibold underline">call {BUSINESS.phoneDisplay}</a>.</p>}
+                </div>
+                <Button type="submit" disabled={!formAction || state.submitting || state.succeeded} aria-describedby={!formAction ? 'contact-availability' : undefined} className="min-h-12 w-full sm:w-auto">{state.submitting ? 'Sending…' : state.succeeded ? 'Request sent' : 'Send Service Request'}</Button>
               </div>
             </form>
           </div>

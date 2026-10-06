@@ -15,6 +15,7 @@ if (rawUrl) {
 }
 if (env.VITE_CONTACT_FORM_ACTION) {
   const endpoint = new URL(env.VITE_CONTACT_FORM_ACTION)
+  if (!/^https:\/\/formspree\.io\/f\/[a-zA-Z0-9]+$/.test(env.VITE_CONTACT_FORM_ACTION)) throw new Error('VITE_CONTACT_FORM_ACTION must be a Formspree endpoint: https://formspree.io/f/{formId}.')
   if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password) throw new Error('VITE_CONTACT_FORM_ACTION must be an HTTPS endpoint without credentials.')
 }
 const serverDir = resolve('node_modules/.cache/gonzalez-prerender')

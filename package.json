@@ -11,6 +11,7 @@
     "deploy:prod": "node scripts/deploy-prod.mjs"
   },
   "dependencies": {
+    "@formspree/react": "^3.0.0",
     "@tabler/icons-react": "^3.41.1",
     "@tailwindcss/vite": "^4.1.16",
     "react": "^19.1.1",
