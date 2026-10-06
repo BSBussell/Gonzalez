@@ -1,5 +1,5 @@
 import { build, loadEnv } from 'vite'
-import { readFile, writeFile, rm } from 'node:fs/promises'
+import { readFile, writeFile, mkdir, rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -58,9 +58,18 @@ try {
     ] : []),
     `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replaceAll('<', '\\u003c')}</script>`,
   ].join('\n    ')
-  let html = await readFile('dist/index.html', 'utf8')
+  const template = await readFile('dist/index.html', 'utf8')
+  let html = template
   html = html.replace('<!--seo-head-->', metadata).replace('<div id="root"></div>', `<div id="root">${render()}</div>`)
   await writeFile('dist/index.html', html)
+  const thankYouHtml = template
+    .replace('<!--seo-head-->', '<meta name="robots" content="noindex, follow" />')
+    .replace(/<title>.*?<\/title>/s, '<title>Thank You | Gonzalez Heating + Cooling</title>')
+    .replace(/<meta name="description" content="[^"]*" \/>/, '<meta name="description" content="Thank you for contacting Gonzalez Heating + Cooling." />')
+    .replace('<div id="root"></div>', `<div id="root">${render('thank-you')}</div>`)
+  await mkdir('dist/thank-you', { recursive: true })
+  await writeFile('dist/thank-you/index.html', thankYouHtml)
+
   await writeFile('dist/robots.txt', `User-agent: *\nAllow: /\n${siteUrl ? `\nSitemap: ${siteUrl}sitemap.xml\n` : ''}`)
   if (siteUrl) await writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escape(siteUrl)}</loc></url></urlset>\n`)
   else console.warn('Preview build is noindex. Set VITE_SITE_URL to generate an indexable site, canonical, and sitemap.')

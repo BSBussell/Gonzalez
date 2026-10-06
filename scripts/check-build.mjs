@@ -38,3 +38,16 @@ if (canonical) {
   await assert.rejects(access('dist/sitemap.xml'))
 }
 console.log('Built HTML: content, schema, anchors, assets, and indexing configuration passed.')
+const thankYou = await readFile('dist/thank-you/index.html', 'utf8')
+assert.equal((thankYou.match(/<h1\b/g) || []).length, 1)
+assert.ok(thankYou.includes('Your request is on its way.'))
+assert.ok(thankYou.includes('content="noindex, follow"'))
+assert.ok(!thankYou.includes('application/ld+json') && !thankYou.includes('rel="canonical"'))
+assert.ok(thankYou.includes(`href="${base}#services"`))
+assert.ok(thankYou.includes(`href="${base}#contact"`))
+for (const [, path] of thankYou.matchAll(/(?:src|href)="(\/[^"#]+)"/g)) {
+  if (path === base || path.includes('#')) continue
+  assert.ok(path.startsWith(base), `Thank-you asset outside base: ${path}`)
+  await access(`dist/${path.slice(base.length)}`)
+}
+console.log('Thank-you HTML: rendered content, navigation, assets, and noindex passed.')

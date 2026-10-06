@@ -35,6 +35,12 @@ The default deployment base comes from the GitHub remote (`/Gonzalez/` for this 
 
 Production builds use `https://gonzalezhvacknox.com/`, configured in tracked `.env.production`, with root-relative assets and an indexable canonical/sitemap. `public/CNAME` declares the same domain for GitHub Pages. DNS and Pages domain/HTTPS settings must still be configured at their providers. For a noindex preview, explicitly override `VITE_SITE_URL` with an empty environment value; use `VITE_BASE_PATH` to match the preview host path. The existing contact fallback stays disabled until an endpoint is configured. This command does not change Pages settings or configure a domain/form provider.
 
+## Form confirmation page
+
+The build generates `/thank-you/index.html`, available at `https://gonzalezhvacknox.com/thank-you/`. It uses the shared header/footer, provides home/call actions, is prerendered and hydrated, and remains noindex and outside the sitemap. Navigation returns to the home page sections. No submission data is stored or shown on this page; it is a redirect destination, not proof of delivery.
+
+After publishing the page, set Formspree’s form Settings → Redirect to that URL. Formspree’s custom redirect is available on Personal, Professional, and Business plans: https://help.formspree.io/articles/form-and-project-settings/thank-you-redirect. A free-plan implementation would need JavaScript submission and a redirect only after the provider confirms success. The native POST form currently retains the provider’s success/error handling until its settings are configured. Do not redirect on a submit click or pretend a failed request succeeded.
+
 ## Configuration and launch
 
 Production defaults live in `.env.production`. Set overrides in `.env.production.local` (gitignored) or the build environment. For development, use `.env.local`; avoid an empty site URL there if you want to retain the production default:

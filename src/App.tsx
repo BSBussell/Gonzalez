@@ -1,3 +1,4 @@
+import { ThankYou } from './components/ThankYou'
 import { ContactForm } from './components/ContactForm'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
@@ -5,7 +6,9 @@ import { Hero } from './components/Hero'
 import { ServicesShowcase } from './components/ServicesShowcase'
 import { useEntranceAnimations } from './lib/useEntranceAnimations'
 
-function App() {
+export type Page = 'home' | 'thank-you'
+
+function App({ page = 'home' }: { page?: Page }) {
   const entranceRef = useEntranceAnimations()
   return (
     <div ref={entranceRef} className="flex min-h-screen flex-col bg-background text-grey-800">
@@ -15,11 +18,13 @@ function App() {
       >
         Skip to content
       </a>
-      <Header />
+      <Header homeHref={page === 'thank-you' ? import.meta.env.BASE_URL : ''} />
       <main id="main-content" className="flex-1">
-        <Hero />
-        <ServicesShowcase />
-        <ContactForm />
+        {page === 'thank-you' ? <ThankYou /> : <>
+          <Hero />
+          <ServicesShowcase />
+          <ContactForm />
+        </>}
       </main>
       <Footer />
     </div>

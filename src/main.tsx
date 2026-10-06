@@ -6,7 +6,7 @@ import App from './App.tsx'
 const root = document.getElementById('root')!
 const app = (
   <StrictMode>
-    <App />
+    <App page={/\/thank-you(?:\/index\.html)?\/?$/.test(window.location.pathname) ? 'thank-you' : 'home'} />
   </StrictMode>
 )
 
