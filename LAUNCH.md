@@ -17,7 +17,7 @@ This pass preserves the visual system and adds build-time rendering, a progressi
 
 ## Launch configuration
 
-Production domain configuration now lives in `.env.production` (`https://gonzalezhvacknox.com`) and `public/CNAME`. Builds use root asset paths and indexable metadata. The supplied Formspree endpoint `https://formspree.io/f/mzeddzbd` is now configured for production. React handles submission errors and redirects confirmed success to `/thank-you/`; verify recipient delivery and provider spam/domain settings as described in README. An explicitly empty site URL generates a noindex preview. DNS, live Pages custom-domain/HTTPS settings, form delivery, and analytics remain unverified; repository configuration alone does not establish a live deployment.
+Production domain configuration now lives in `.env.production` (`https://www.gonzalezhvacknox.com`) and `public/CNAME`. Builds use root asset paths and indexable metadata. The supplied Formspree endpoint `https://formspree.io/f/mzeddzbd` is now configured for production. React handles submission errors and redirects confirmed success to `/thank-you/`; verify recipient delivery and provider spam/domain settings as described in README. An explicitly empty site URL generates a noindex preview. DNS, live Pages custom-domain/HTTPS settings, form delivery, and analytics remain unverified; repository configuration alone does not establish a live deployment.
 
 No postal street address was supplied; schema does not invent one. HVACBusiness markup describes the business but does not establish eligibility for Google's local-business rich results. Verify live markup with search-engine tools after facts and domain are finalized.
 
