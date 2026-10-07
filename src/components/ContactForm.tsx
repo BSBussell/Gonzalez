@@ -77,6 +77,8 @@ export function ContactForm() {
             {!formAction && <p id="contact-availability" className="mt-4 text-sm leading-6 text-grey-600">Online requests are not available yet. Please <a href={BUSINESS.phoneHref} className="font-semibold text-blue underline underline-offset-4">call {BUSINESS.phoneDisplay}</a> to request service.</p>}
 
             <form action={formAction} method="post" onSubmit={handleSubmit} aria-busy={state.submitting} className="mt-7 grid gap-x-5 gap-y-5 sm:grid-cols-2">
+              {/* Formspree discards submissions when this bot-only field is filled. */}
+              <input type="text" name="_gotcha" defaultValue="" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
               <Field label="Name" name="name">
                 <input id="contact-name" name="name" aria-invalid={!!state.errors?.getFieldErrors('name').length} aria-describedby="contact-name-error" type="text" autoComplete="name" required className={inputClass} />
                 <ValidationError id="contact-name-error" field="name" errors={state.errors} className="mt-2 text-sm text-red" />

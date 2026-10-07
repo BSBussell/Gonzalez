@@ -46,7 +46,7 @@ The form uses `@formspree/react` to submit the existing fields, show validation/
 Production defaults live in `.env.production`. Set overrides in `.env.production.local` (gitignored) or the build environment. For development, use `.env.local`; avoid an empty site URL there if you want to retain the production default:
 
 - `VITE_SITE_URL`: final public HTTPS origin, e.g. `https://your-domain.com` (no path). With this set, the build generates the canonical, absolute social URLs, an indexable robots meta tag, `robots.txt`, and a one-URL sitemap. Without it, the build is **noindex**, omits canonical/sitemap, and warns. Keep this empty for preview deployments. This is indexing control, not access control.
-- `VITE_CONTACT_FORM_ACTION`: Formspree HTTPS endpoint (`https://formspree.io/f/{formId}`). Production defaults to the supplied `mzeddzbd` form. Without it, the form remains visible with a call notice and disabled submission. Configure spam protection, delivery recipients, and success/error pages at the form provider. Never put secrets in `VITE_` variables.
+- `VITE_CONTACT_FORM_ACTION`: Formspree HTTPS endpoint (`https://formspree.io/f/{formId}`). Shared `.env` configures the supplied `mzeddzbd` form for both development and production. Restart the dev server after changing environment files. Without it, the form remains visible with a call notice and disabled submission. Configure spam protection, delivery recipients, and success/error pages at the form provider. Never put secrets in `VITE_` variables.
 
 The earlier `VITE_FORMSPREE_ID` README instruction was stale; it is not supported by the form.
 
